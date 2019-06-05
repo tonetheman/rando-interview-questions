@@ -7,41 +7,46 @@ import (
 )
 
 func os(cc rune, count int, os * bytes.Buffer) {
-	fmt.Println("dbg:os",cc,count)
-	count1,err1 := os.WriteString(string(cc))
+	//fmt.Println("dbg:os",cc,count)
+	if cc==-1 {
+		// this is the first character
+		// nothing to do yet just ignore it 
+		// and do not write
+		return
+	}
+	_,err1 := os.WriteString(string(cc))
 	if err1 != nil {
 		fmt.Println("dbg:os:err write 1",err1)
 	}else {
-		fmt.Println("dbg:os:wrote",count1)
+		//fmt.Println("dbg:os:wrote",count1)
 	}
 	val := strconv.Itoa(count)
-	count2,err2 := os.WriteString(val)
+	_,err2 := os.WriteString(val)
 	if err2 != nil {
 		fmt.Println("dbg:os:err write 2",err2)
 	}else {
-		fmt.Println("dbg:os:wrote",count2)
+		//fmt.Println("dbg:os:wrote",count2)
 	}
 
 }
 
 func compress(s string) string {
-	fmt.Println("compress orig:",s,len(s))
+	//fmt.Println("compress orig:",s,len(s))
 	var outputBuffer bytes.Buffer
 	var cc rune = -1
 	xcount := 0
 	for _,v := range s {
-		fmt.Println("dbg",v)
-		if cc == -1 {
-			// this is the start so nothing in front
-			cc = v
-			xcount = 1
-			continue
-		} else if cc==v {
+		//fmt.Println("dbg",v)
+		if cc==v {
 			// in this case this is another character
 			xcount++
 		} else {
 			// in this case the cc did not match
 			// output the character and the xcount
+			// this can also happen on the very first
+			// character in that case send it through
+			// with the cc at -1 to signal the printer
+			// to just keep going
 			os(cc,xcount,&outputBuffer)
 			cc=v
 			xcount = 1
@@ -70,15 +75,16 @@ func testBuffer() {
 func main() {
 	//testBuffer()
 
-	//res:= compress("aaa")
-	//fmt.Println("res from compress",res)
+	res:= compress("aaa")
+	fmt.Println("res from compress",res)
 
-	//res := compress("aab")
-	//fmt.Println("res from compress",res)
+	res = compress("aab")
+	fmt.Println("res from compress",res)
 
-	//res := compress("aabcccc")
-	//fmt.Println("res from compress",res,len(res))
-	res := compress("aabccccddddd")
+	res = compress("aabcccc")
+	fmt.Println("res from compress",res,len(res))
+	
+	res = compress("aabccccddddd")
 	fmt.Println("res from compress",res,len(res))
 
 }
